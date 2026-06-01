@@ -2,7 +2,7 @@
 #include <fstream>
 using namespace std;
 
-struct {
+struct tes {
     
 };
 
