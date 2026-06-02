@@ -43,7 +43,41 @@ void tambahData() {
     cout<<"Data Berhasil Disimpan"<<endl;
 }
 
+int hitungData(){
+    ifstream file("dataMahasiswa.txt");
+    
+    if (!file)
+    {
+        return 0;
+    }
 
+    string temp;
+    int count = 0;
+    
+    while (getline(file,temp))
+    {
+        count++;
+    }
+    file.close();
+    return count;
+}
+
+void muatData(Mahasiswa m[], int &n) {
+    ifstream file("resepNusantara.txt");
+    n = 0;
+
+    while (getline(file, m[n].namaMahasiwa, '|')) 
+    {
+        getline(file, m[n].nim, '|');
+
+        getline(file, m[n].prodi);
+
+        file>>m[n].ipk;
+        file.ignore();
+        n++;
+    }
+    file.close();
+}
 
 int main() {
     do{
