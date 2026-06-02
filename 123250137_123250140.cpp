@@ -79,6 +79,35 @@ void muatData(Mahasiswa m[], int &n) {
     file.close();
 }
 
+void tampilkanData() {
+    ifstream file("dataMahasiswa.txt");
+    if (!file || file.peek() == EOF)
+    {
+        cout<<"File belum ada atau data masih kosong."<<endl;
+        return;
+    }
+    Mahasiswa m;
+    int no = 1;
+
+    while (getline(file,m.namaMahasiwa, '|'))
+    {
+        getline(file, m.nim, '|');
+
+        getline(file, m.prodi);
+
+        file >> m.ipk;
+        file.ignore();
+
+        cout<<"Data ke-"<< no++ << endl;
+        cout<<"Nama Mahasiswa   : "<<m.namaMahasiwa<<endl;
+        cout<<"Nim              : "<<m.nim<<endl;
+        cout<<"Prodi            : "<<m.prodi<<endl;
+        cout<<"IPK              : "<<m.ipk<<endl;
+        cout<<endl;
+    }
+    file.close();
+}
+
 int main() {
     do{
         int pilih;
@@ -87,7 +116,7 @@ int main() {
         cout<<"               DATA MAHASISWA               "<<endl;
         cout<<"============================================"<<endl;
         cout<<"1. Tambah Data Mahasiswa"<<endl;
-        cout<<"2. aaa"<<endl;
+        cout<<"2. Tampilkan Data Mahasiswa"<<endl;
         cout<<"3. aaa"<<endl;
         cout<<"4. aaa"<<endl;
         cout<<"5. aaa"<<endl;
@@ -101,7 +130,7 @@ int main() {
             tambahData();
             break;
         case 2:
-            //aaa
+            tampilkanData();
             break;
         case 3:
             //aaa
