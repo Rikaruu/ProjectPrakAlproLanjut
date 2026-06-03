@@ -553,7 +553,7 @@ int main() {
         cout<<"6. Hapus Data Mahasiswa"<<endl;
         cout<<"7. Keluar Program"<<endl;
         cout<<"============================================"<<endl;
-        cout<<"Pilih Menu (1-?): ";
+        cout<<"Pilih Menu (1-7): ";
         cin>>pilih;
 
         switch (pilih)
