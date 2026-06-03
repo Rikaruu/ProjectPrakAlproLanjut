@@ -145,31 +145,6 @@ void tampilkanData() {
     file.close();
 }
 
-int partitionNama(Mahasiswa m[], int low, int high)
-{
-    string pivot = hurufKecil(m[high].namaMahasiswa);
-
-    int i = low - 1;
-
-    for(int j = low; j < high; j++)
-    {
-        if(hurufKecil(m[j].namaMahasiswa) < pivot)
-        {
-            i++;
-
-            Mahasiswa temp = m[i];
-            m[i] = m[j];
-            m[j] = temp;
-        }
-    }
-
-    Mahasiswa temp = m[i + 1];
-    m[i + 1] = m[high];
-    m[high] = temp;
-
-    return i + 1;
-}
-
 int partitionNim(Mahasiswa m[], int low, int high, bool ascending) {
     string pivot = m[high].nim;
 
@@ -207,16 +182,6 @@ void quickSort(Mahasiswa m[], int low, int high, bool ascending) {
     }
 }
 
-void quickSortNama(Mahasiswa m[], int low, int high)
-{
-    if(low < high)
-    {
-        int pi = partitionNama(m, low, high);
-
-        quickSortNama(m, low, pi - 1);
-        quickSortNama(m, pi + 1, high);
-    }
-}
 
 void sortingNim() {
     Mahasiswa m[100];
