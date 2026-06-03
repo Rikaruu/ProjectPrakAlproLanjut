@@ -6,6 +6,7 @@ struct Mahasiswa {
     string namaMahasiswa;
     string nim;
     string prodi;
+    string fakultas;
     float ipk;
 };
 
@@ -29,6 +30,8 @@ void tambahData() {
 
         cout<<"Prodi         : ";
         getline(cin, m.prodi);
+        cout<<"Fakultas      : ";
+        getline(cin, m.fakultas);
 
         cout<<"IPK      : ";
         cin>>m.ipk;
@@ -37,6 +40,7 @@ void tambahData() {
         file<<m.namaMahasiswa<<"|";
         file<<m.nim<<"|";
         file<<m.prodi<<"|";
+        file<<m.fakultas<<"|";
         file<<m.ipk<<endl;
     }
     file.close();
@@ -76,6 +80,7 @@ void muatData(Mahasiswa m[], int &n) {
     {
         getline(file, m[n].nim, '|');
         getline(file, m[n].prodi, '|');
+        getline(file, m[n].fakultas, '|');
 
         file >> m[n].ipk;
         file.ignore();
@@ -99,6 +104,7 @@ void tampilkanData() {
     {
         getline(file, m.nim, '|');
         getline(file, m.prodi, '|');
+        getline(file, m.fakultas, '|');
         file >> m.ipk;
         file.ignore();
 
@@ -106,6 +112,7 @@ void tampilkanData() {
         cout<<"Nama Mahasiswa   : "<<m.namaMahasiswa<<endl;
         cout<<"Nim              : "<<m.nim<<endl;
         cout<<"Prodi            : "<<m.prodi<<endl;
+        cout<<"Fakultas         : "<<m.fakultas<<endl;
         cout<<"IPK              : "<<m.ipk<<endl;
         cout<<endl;
     }
@@ -164,34 +171,127 @@ void sortingNim() {
     int pilihan;
 
     cout<<endl;
-    cout << "Pilih Urutan:" << endl;
-    cout << "1. Ascending" << endl;
-    cout << "2. Descending" << endl;
-    cout << "Pilihan: ";
-    cin >> pilihan;
+    cout<<"Pilih Urutan : " <<endl;
+    cout<<"1. Ascending" <<endl;
+    cout<<"2. Descending" <<endl;
+    cout<<"Pilihan: ";
+    cin>>pilihan;
 
     bool ascending = (pilihan == 1);
 
     if (pilihan != 1 && pilihan != 2)
     {
-        cout << "Pilihan tidak valid!" << endl;
+        cout<<"Pilihan tidak valid!"<<endl;
         return;
     }
 
     quickSort(m, 0, n - 1, ascending);
 
     cout<<endl;
-    cout << "=== HASIL SORTING NIM ==="<<endl;
+    cout<<"=== HASIL SORTING NIM ==="<<endl;
     
     for(int i = 0; i < n; i++)
     {
-        cout << "Data ke-" << i + 1 << endl;
-        cout << "Nama Mahasiswa : " << m[i].namaMahasiswa << endl;
-        cout << "NIM            : " << m[i].nim << endl;
-        cout << "Prodi          : " << m[i].prodi << endl;
-        cout << "IPK            : " << m[i].ipk << endl;
-        cout << endl;
+        cout<<"Data ke-" << i + 1 <<endl;
+        cout<<"Nama Mahasiswa : " <<m[i].namaMahasiswa << endl;
+        cout<<"NIM            : " <<m[i].nim << endl;
+        cout<<"Prodi          : " <<m[i].prodi << endl;
+        cout<<"Fakultas       : " <<m[i].fakultas<<endl;
+        cout<<"IPK            : " <<m[i].ipk << endl;
+        cout<<endl;
     }
+}
+
+string hurufKecil(string teks) {
+    for(int i = 0; i < teks.length(); i++)
+    {
+        teks[i] = tolower(teks[i]);
+    }
+
+    return teks;
+}
+
+void cariData() {
+    Mahasiswa m[100];
+    int n;
+
+    muatData(m, n);
+
+    if(n == 0)
+    {
+        cout << "Data kosong!" << endl;
+        return;
+    }
+
+    int pilihan;
+
+    cout<<endl;
+    cout<<"Cari Berdasarkan:"<<endl;
+    cout<<"1. Nama Mahasiswa"<<endl;
+    cout<<"2. NIM" << endl;
+    cout<<"Pilihan: ";
+    cin>>pilihan;
+    cin.ignore();
+
+    string cari;
+
+    cout<<"Masukkan kata yang ingin dicari: ";
+    getline(cin, cari);
+
+    cari = hurufKecil(cari);
+
+    int kiri = 0;
+    int kanan = n - 1;
+    int tengah;
+    int found = -1;
+
+    while(kiri <= kanan)
+    {
+        tengah = (kiri + kanan) / 2;
+
+        string dataCari;
+
+        if(pilihan == 1)
+        {
+            dataCari = hurufKecil(m[tengah].namaMahasiswa);
+        }
+        else if(pilihan == 2)
+        {
+            dataCari = hurufKecil(m[tengah].nim);
+        }
+        else
+        {
+            cout << "Pilihan tidak valid!" << endl;
+            return;
+        }
+
+        if(dataCari == cari)
+        {
+            found = tengah;
+            break;
+        }
+        else if(dataCari < cari)
+        {
+            kiri = tengah + 1;
+        }
+        else
+        {
+            kanan = tengah - 1;
+        }
+    }
+
+    if(found == -1)
+    {
+        cout << "Data tidak ditemukan!" << endl;
+        return;
+    }
+    cout<<endl;
+    cout << "Data ditemukan!" << endl;
+    cout << "Nama Mahasiswa : " << m[found].namaMahasiswa << endl;
+    cout << "NIM            : " << m[found].nim << endl;
+    cout << "Prodi          : " << m[found].prodi << endl;
+    cout << "Fakultas       : " << m[found].fakultas << endl;
+    cout << "IPK            : " << m[found].ipk << endl;
 }
 
 int main() {
@@ -204,8 +304,9 @@ int main() {
         cout<<"1. Tambah Data Mahasiswa"<<endl;
         cout<<"2. Tampilkan Data Mahasiswa"<<endl;
         cout<<"3. Sorting Berdasarkan Nim"<<endl;
-        cout<<"4. aaa"<<endl;
-        cout<<"5. aaa"<<endl;
+        cout<<"4. Cari Data Mahasiswa"<<endl;
+        cout<<"5. Ubah Data Mahasiswa"<<endl;
+        cout<<"6. Hapus Data Mahasiswa"<<endl;
         cout<<"============================================"<<endl;
         cout<<"Pilih Menu (1-?): ";
         cin>>pilih;
@@ -222,10 +323,13 @@ int main() {
             sortingNim();
             break;
         case 4:
-            //aaa
+            cariData();
             break;
         case 5:
-            //aaa
+            ubahData();
+            break;
+        case 6:
+            hapusData();
             break;
         default:
             cout<<"Pilihan Tidak Valid"<<endl;
