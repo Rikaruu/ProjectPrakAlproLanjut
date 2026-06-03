@@ -16,7 +16,7 @@ void tambahData() {
     cout<<"Banyak data yang ingin ditambah: ";
     cin>>banyakData;
     cin.ignore();
-
+    
     Mahasiswa m;
     for (int i = 0; i < banyakData; i++) 
     {
@@ -43,7 +43,7 @@ void tambahData() {
     cout<<"Data Berhasil Disimpan"<<endl;
 }
 
-int hitungData(){
+int hitungData() {
     ifstream file("dataMahasiswa.txt");
     
     if (!file) 
@@ -62,7 +62,7 @@ int hitungData(){
     return count;
 }
 
-void muatData(Mahasiswa m[], int &n){ 
+void muatData(Mahasiswa m[], int &n) { 
     ifstream file("dataMahasiswa.txt");
 
     if (!file)
@@ -112,8 +112,7 @@ void tampilkanData() {
     file.close();
 }
 
-int partitionNim(Mahasiswa m[], int low, int high)
-{
+int partitionNim(Mahasiswa m[], int low, int high) {
     string pivot = m[high].nim;
 
     int i = low - 1;
@@ -137,8 +136,7 @@ int partitionNim(Mahasiswa m[], int low, int high)
     return i + 1;
 }
 
-void quickSort(Mahasiswa m[], int low, int high)
-{
+void quickSort(Mahasiswa m[], int low, int high) {
     if (low < high)
     {
         int pi = partitionNim(m, low, high);
@@ -148,8 +146,7 @@ void quickSort(Mahasiswa m[], int low, int high)
     }
 }
 
-void sortingNim()
-{
+void sortingNim() {
     Mahasiswa m[100];
     int n;
 
