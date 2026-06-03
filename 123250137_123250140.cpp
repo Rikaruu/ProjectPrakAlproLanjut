@@ -3,7 +3,7 @@
 using namespace std;
 
 struct Mahasiswa {
-    string namaMahasiwa;
+    string namaMahasiswa;
     string nim;
     string prodi;
     float ipk;
@@ -18,11 +18,11 @@ void tambahData() {
     cin.ignore();
 
     Mahasiswa m;
-    for (int i = 0; i < banyakData; i++)
+    for (int i = 0; i < banyakData; i++) 
     {
         cout<<"Data ke-"<<i+1<<endl;
         cout<<"Nama Mahasiswa: ";
-        getline(cin, m.namaMahasiwa);
+        getline(cin, m.namaMahasiswa);
 
         cout<<"Nim           : ";
         getline(cin, m.nim);
@@ -34,9 +34,9 @@ void tambahData() {
         cin>>m.ipk;
         cin.ignore();
 
-        file<<m.namaMahasiwa<<" | ";
-        file<<m.nim<<" | ";
-        file<<m.prodi<<" | ";
+        file<<m.namaMahasiswa<<"|";
+        file<<m.nim<<"|";
+        file<<m.prodi<<"|";
         file<<m.ipk<<endl;
     }
     file.close();
@@ -46,7 +46,7 @@ void tambahData() {
 int hitungData(){
     ifstream file("dataMahasiswa.txt");
     
-    if (!file)
+    if (!file) 
     {
         return 0;
     }
@@ -62,18 +62,24 @@ int hitungData(){
     return count;
 }
 
-void muatData(Mahasiswa m[], int &n) {
-    ifstream file("resepNusantara.txt");
+void muatData(Mahasiswa m[], int &n){ 
+    ifstream file("dataMahasiswa.txt");
+
+    if (!file)
+    {
+        n = 0;
+        return;
+    }
     n = 0;
 
-    while (getline(file, m[n].namaMahasiwa, '|')) 
+    while(getline(file, m[n].namaMahasiswa, '|'))
     {
         getline(file, m[n].nim, '|');
+        getline(file, m[n].prodi, '|');
 
-        getline(file, m[n].prodi);
-
-        file>>m[n].ipk;
+        file >> m[n].ipk;
         file.ignore();
+
         n++;
     }
     file.close();
@@ -89,17 +95,15 @@ void tampilkanData() {
     Mahasiswa m;
     int no = 1;
 
-    while (getline(file,m.namaMahasiwa, '|'))
+    while (getline(file, m.namaMahasiswa, '|'))
     {
         getline(file, m.nim, '|');
-
-        getline(file, m.prodi);
-
+        getline(file, m.prodi, '|');
         file >> m.ipk;
         file.ignore();
 
         cout<<"Data ke-"<< no++ << endl;
-        cout<<"Nama Mahasiswa   : "<<m.namaMahasiwa<<endl;
+        cout<<"Nama Mahasiswa   : "<<m.namaMahasiswa<<endl;
         cout<<"Nim              : "<<m.nim<<endl;
         cout<<"Prodi            : "<<m.prodi<<endl;
         cout<<"IPK              : "<<m.ipk<<endl;
@@ -108,16 +112,80 @@ void tampilkanData() {
     file.close();
 }
 
+int partitionNim(Mahasiswa m[], int low, int high)
+{
+    string pivot = m[high].nim;
+
+    int i = low - 1;
+
+    for (int j = low; j < high; j++)
+    {
+        if (m[j].nim < pivot)
+        {
+            i++;
+
+            Mahasiswa temp = m[i];
+            m[i] = m[j];
+            m[j] = temp;
+        }
+    }
+
+    Mahasiswa temp = m[i + 1];
+    m[i + 1] = m[high];
+    m[high] = temp;
+
+    return i + 1;
+}
+
+void quickSort(Mahasiswa m[], int low, int high)
+{
+    if (low < high)
+    {
+        int pi = partitionNim(m, low, high);
+
+        quickSort(m, low, pi - 1);
+        quickSort(m, pi + 1, high);
+    }
+}
+
+void sortingNim()
+{
+    Mahasiswa m[100];
+    int n;
+
+    muatData(m, n);
+
+    if(n == 0)
+    {
+        cout << "Data kosong!" << endl;
+        return;
+    }
+
+    quickSort(m, 0, n - 1);
+
+    cout << "\n=== DATA SETELAH SORTING NIM ===\n";
+
+    for(int i = 0; i < n; i++)
+    {
+        cout << "Data ke-" << i + 1 << endl;
+        cout << "Nama Mahasiswa : " << m[i].namaMahasiswa << endl;
+        cout << "NIM            : " << m[i].nim << endl;
+        cout << "Prodi          : " << m[i].prodi << endl;
+        cout << "IPK            : " << m[i].ipk << endl;
+        cout << endl;
+    }
+}
+
 int main() {
+    int pilih;
     do{
-        int pilih;
 
         cout<<"============================================"<<endl;
         cout<<"               DATA MAHASISWA               "<<endl;
         cout<<"============================================"<<endl;
         cout<<"1. Tambah Data Mahasiswa"<<endl;
         cout<<"2. Tampilkan Data Mahasiswa"<<endl;
-        cout<<"3. aaa"<<endl;
+        cout<<"3. Sorting Berdasarkan Nim"<<endl;
         cout<<"4. aaa"<<endl;
         cout<<"5. aaa"<<endl;
         cout<<"============================================"<<endl;
@@ -133,7 +201,7 @@ int main() {
             tampilkanData();
             break;
         case 3:
-            //aaa
+            sortingNim();
             break;
         case 4:
             //aaa
