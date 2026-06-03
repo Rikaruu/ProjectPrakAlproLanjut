@@ -1,6 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include <cctype>
+#include <limits>
 using namespace std;
 
 struct Mahasiswa {
@@ -17,7 +18,7 @@ bool validNim(string nim) {
         return false;
     }
 
-    for(int i = 0; i < nim.length(); i++)
+    for(int i = 0; i<nim.length(); i++)
     {
         if(nim[i] < '0' || nim[i] > '9')
         {
@@ -28,7 +29,7 @@ bool validNim(string nim) {
 }
 
 string hurufKecil(string teks) {
-    for(int i = 0; i < teks.length(); i++)
+    for(int i = 0; i<teks.length(); i++)
     {
         teks[i] = tolower(teks[i]);
     }
@@ -78,7 +79,7 @@ void tambahData() {
                 cout << "IPK harus antara 0 - 4!" << endl;
             }
         } while(m.ipk < 0 || m.ipk > 4);
-        cin.ignore();
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
 
         file<<m.namaMahasiswa<<"|";
         file<<m.nim<<"|";
@@ -277,10 +278,9 @@ void cariData() {
 
     int pilihan;
 
-    cout << endl;
-    cout << "Cari Berdasarkan:" << endl;
-    cout << "1. Nama Mahasiswa" << endl;
-    cout << "2. NIM" << endl;
+    cout << "\nCari Berdasarkan:\n";
+    cout << "1. Nama Mahasiswa\n";
+    cout << "2. NIM\n";
     cout << "Pilihan: ";
     cin >> pilihan;
     cin.ignore();
@@ -292,94 +292,82 @@ void cariData() {
     }
 
     string cari;
-
     cout << "Masukkan kata yang ingin dicari: ";
     getline(cin, cari);
 
-    cari = hurufKecil(cari);
-
-    // SORTING SEBELUM BINARY SEARCH
+    // SEARCH BERDASARKAN NAMA
     if(pilihan == 1)
     {
-        quickSortNama(m, 0, n - 1);
+        cari = hurufKecil(cari);
+
+        bool ditemukan = false;
+
+        for(int i = 0; i < n; i++)
+        {
+            string nama = hurufKecil(m[i].namaMahasiswa);
+
+            // mencari sebagian nama
+            if(nama.find(cari) != string::npos)
+            {
+                ditemukan = true;
+
+                cout << "\nData ditemukan!\n";
+                cout << "Nama Mahasiswa : " << m[i].namaMahasiswa << endl;
+                cout << "NIM            : " << m[i].nim << endl;
+                cout << "Prodi          : " << m[i].prodi << endl;
+                cout << "Fakultas       : " << m[i].fakultas << endl;
+                cout << "IPK            : " << m[i].ipk << endl;
+                cout << endl;
+            }
+        }
+
+        if(!ditemukan)
+        {
+            cout << "Data tidak ditemukan!" << endl;
+        }
     }
+
+    // SEARCH BERDASARKAN NIM
     else
     {
         quickSort(m, 0, n - 1, true);
-    }
 
-    int kiri = 0;
-    int kanan = n - 1;
-    int found = -1;
+        int kiri = 0;
+        int kanan = n - 1;
+        int found = -1;
 
-    while(kiri <= kanan)
-    {
-        int tengah = (kiri + kanan) / 2;
-
-        string dataCari;
-
-        if(pilihan == 1)
+        while(kiri <= kanan)
         {
-            dataCari = hurufKecil(m[tengah].namaMahasiswa);
+            int tengah = (kiri + kanan) / 2;
+
+            if(m[tengah].nim == cari)
+            {
+                found = tengah;
+                break;
+            }
+            else if(m[tengah].nim < cari)
+            {
+                kiri = tengah + 1;
+            }
+            else
+            {
+                kanan = tengah - 1;
+            }
+        }
+
+        if(found == -1)
+        {
+            cout << "Data tidak ditemukan!" << endl;
         }
         else
         {
-            dataCari = m[tengah].nim;
+            cout << "\nData ditemukan!\n";
+            cout << "Nama Mahasiswa : " << m[found].namaMahasiswa << endl;
+            cout << "NIM            : " << m[found].nim << endl;
+            cout << "Prodi          : " << m[found].prodi << endl;
+            cout << "Fakultas       : " << m[found].fakultas << endl;
+            cout << "IPK            : " << m[found].ipk << endl;
         }
-
-        if(dataCari == cari)
-        {
-            found = tengah;
-            break;
-        }
-        else if(dataCari < cari)
-        {
-            kiri = tengah + 1;
-        }
-        else
-        {
-            kanan = tengah - 1;
-        }
-    }
-
-    if(found == -1)
-{
-    cout << "Data tidak ditemukan!" << endl;
-    return;
-}
-
-    cout << "\nData ditemukan!\n" << endl;
-
-    if(pilihan == 1) // cari berdasarkan nama
-    {
-        int i = found;
-
-        while(i >= 0 && hurufKecil(m[i].namaMahasiswa) == cari)
-        {
-            i--;
-        }
-
-        i++;
-
-        while(i < n &&
-            hurufKecil(m[i].namaMahasiswa) == cari)
-        {
-            cout << "Nama Mahasiswa : " << m[i].namaMahasiswa << endl;
-            cout << "NIM            : " << m[i].nim << endl;
-            cout << "Prodi          : " << m[i].prodi << endl;
-            cout << "Fakultas       : " << m[i].fakultas << endl;
-            cout << "IPK            : " << m[i].ipk << endl;
-            cout << endl;
-            i++;
-        }   
-    }
-    else // cari berdasarkan NIM
-    {
-        cout << "Nama Mahasiswa : " << m[found].namaMahasiswa << endl; 
-        cout << "NIM            : " << m[found].nim << endl;
-        cout << "Prodi          : " << m[found].prodi << endl;
-        cout << "Fakultas       : " << m[found].fakultas << endl;
-        cout << "IPK            : " << m[found].ipk << endl;
     }
 }
 
@@ -469,7 +457,7 @@ void ubahData() {
             cout << "IPK harus antara 0 - 4!" << endl;
         }
     } while(m[index].ipk < 0 || m[index].ipk > 4);
-    cin.ignore();
+    cin.ignore(numeric_limits<streamsize>::max(), '\n');
 
     simpanData(m, n);
 
