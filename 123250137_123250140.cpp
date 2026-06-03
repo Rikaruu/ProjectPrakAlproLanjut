@@ -1,5 +1,6 @@
 #include <iostream>
 #include <fstream>
+#include <cctype>
 using namespace std;
 
 struct Mahasiswa {
@@ -9,6 +10,31 @@ struct Mahasiswa {
     string fakultas;
     float ipk;
 };
+
+bool validNim(string nim) {
+    if(nim.length() != 9)
+    {
+        return false;
+    }
+
+    for(int i = 0; i < nim.length(); i++)
+    {
+        if(nim[i] < '0' || nim[i] > '9')
+        {
+            return false;
+        }
+    }
+    return true;
+}
+
+string hurufKecil(string teks) {
+    for(int i = 0; i < teks.length(); i++)
+    {
+        teks[i] = tolower(teks[i]);
+    }
+
+    return teks;
+}
 
 void tambahData() {
     ofstream file("dataMahasiswa.txt", ios::app);
@@ -25,16 +51,33 @@ void tambahData() {
         cout<<"Nama Mahasiswa: ";
         getline(cin, m.namaMahasiswa);
 
-        cout<<"Nim           : ";
-        getline(cin, m.nim);
+        do
+        {
+        cout<<"NIM           : ";
+            getline(cin, m.nim);
+
+            if(!validNim(m.nim))
+            {
+                cout<<"NIM harus berupa 9 digit angka!"<<endl;
+            }
+
+        } while(!validNim(m.nim));
 
         cout<<"Prodi         : ";
         getline(cin, m.prodi);
         cout<<"Fakultas      : ";
         getline(cin, m.fakultas);
 
-        cout<<"IPK      : ";
-        cin>>m.ipk;
+        do
+        {
+            cout<<"IPK           : ";
+            cin >> m.ipk;
+
+            if(m.ipk < 0 || m.ipk > 4)
+            {
+                cout << "IPK harus antara 0 - 4!" << endl;
+            }
+        } while(m.ipk < 0 || m.ipk > 4);
         cin.ignore();
 
         file<<m.namaMahasiswa<<"|";
@@ -47,25 +90,6 @@ void tambahData() {
     cout<<"Data Berhasil Disimpan"<<endl;
 }
 
-int hitungData() {
-    ifstream file("dataMahasiswa.txt");
-    
-    if (!file) 
-    {
-        return 0;
-    }
-
-    string temp;
-    int count = 0;
-    
-    while (getline(file,temp))
-    {
-        count++;
-    }
-    file.close();
-    return count;
-}
-
 void muatData(Mahasiswa m[], int &n) { 
     ifstream file("dataMahasiswa.txt");
 
@@ -76,7 +100,7 @@ void muatData(Mahasiswa m[], int &n) {
     }
     n = 0;
 
-    while(getline(file, m[n].namaMahasiswa, '|'))
+    while(n < 100 && getline(file, m[n].namaMahasiswa, '|'))
     {
         getline(file, m[n].nim, '|');
         getline(file, m[n].prodi, '|');
@@ -92,6 +116,7 @@ void muatData(Mahasiswa m[], int &n) {
 
 void tampilkanData() {
     ifstream file("dataMahasiswa.txt");
+
     if (!file || file.peek() == EOF)
     {
         cout<<"File belum ada atau data masih kosong."<<endl;
@@ -117,6 +142,31 @@ void tampilkanData() {
         cout<<endl;
     }
     file.close();
+}
+
+int partitionNama(Mahasiswa m[], int low, int high)
+{
+    string pivot = hurufKecil(m[high].namaMahasiswa);
+
+    int i = low - 1;
+
+    for(int j = low; j < high; j++)
+    {
+        if(hurufKecil(m[j].namaMahasiswa) < pivot)
+        {
+            i++;
+
+            Mahasiswa temp = m[i];
+            m[i] = m[j];
+            m[j] = temp;
+        }
+    }
+
+    Mahasiswa temp = m[i + 1];
+    m[i + 1] = m[high];
+    m[high] = temp;
+
+    return i + 1;
 }
 
 int partitionNim(Mahasiswa m[], int low, int high, bool ascending) {
@@ -153,6 +203,17 @@ void quickSort(Mahasiswa m[], int low, int high, bool ascending) {
 
         quickSort(m, low, pi - 1, ascending);
         quickSort(m, pi + 1, high, ascending);
+    }
+}
+
+void quickSortNama(Mahasiswa m[], int low, int high)
+{
+    if(low < high)
+    {
+        int pi = partitionNama(m, low, high);
+
+        quickSortNama(m, low, pi - 1);
+        quickSortNama(m, pi + 1, high);
     }
 }
 
@@ -202,15 +263,6 @@ void sortingNim() {
     }
 }
 
-string hurufKecil(string teks) {
-    for(int i = 0; i < teks.length(); i++)
-    {
-        teks[i] = tolower(teks[i]);
-    }
-
-    return teks;
-}
-
 void cariData() {
     Mahasiswa m[100];
     int n;
@@ -225,29 +277,44 @@ void cariData() {
 
     int pilihan;
 
-    cout<<endl;
-    cout<<"Cari Berdasarkan:"<<endl;
-    cout<<"1. Nama Mahasiswa"<<endl;
-    cout<<"2. NIM" << endl;
-    cout<<"Pilihan: ";
-    cin>>pilihan;
+    cout << endl;
+    cout << "Cari Berdasarkan:" << endl;
+    cout << "1. Nama Mahasiswa" << endl;
+    cout << "2. NIM" << endl;
+    cout << "Pilihan: ";
+    cin >> pilihan;
     cin.ignore();
+
+    if(pilihan != 1 && pilihan != 2)
+    {
+        cout << "Pilihan tidak valid!" << endl;
+        return;
+    }
 
     string cari;
 
-    cout<<"Masukkan kata yang ingin dicari: ";
+    cout << "Masukkan kata yang ingin dicari: ";
     getline(cin, cari);
 
     cari = hurufKecil(cari);
 
+    // SORTING SEBELUM BINARY SEARCH
+    if(pilihan == 1)
+    {
+        quickSortNama(m, 0, n - 1);
+    }
+    else
+    {
+        quickSort(m, 0, n - 1, true);
+    }
+
     int kiri = 0;
     int kanan = n - 1;
-    int tengah;
     int found = -1;
 
     while(kiri <= kanan)
     {
-        tengah = (kiri + kanan) / 2;
+        int tengah = (kiri + kanan) / 2;
 
         string dataCari;
 
@@ -255,14 +322,9 @@ void cariData() {
         {
             dataCari = hurufKecil(m[tengah].namaMahasiswa);
         }
-        else if(pilihan == 2)
-        {
-            dataCari = hurufKecil(m[tengah].nim);
-        }
         else
         {
-            cout << "Pilihan tidak valid!" << endl;
-            return;
+            dataCari = m[tengah].nim;
         }
 
         if(dataCari == cari)
@@ -281,22 +343,204 @@ void cariData() {
     }
 
     if(found == -1)
+{
+    cout << "Data tidak ditemukan!" << endl;
+    return;
+}
+
+    cout << "\nData ditemukan!\n" << endl;
+
+    if(pilihan == 1) // cari berdasarkan nama
     {
-        cout << "Data tidak ditemukan!" << endl;
+        int i = found;
+
+        while(i >= 0 && hurufKecil(m[i].namaMahasiswa) == cari)
+        {
+            i--;
+        }
+
+        i++;
+
+        while(i < n &&
+            hurufKecil(m[i].namaMahasiswa) == cari)
+        {
+            cout << "Nama Mahasiswa : " << m[i].namaMahasiswa << endl;
+            cout << "NIM            : " << m[i].nim << endl;
+            cout << "Prodi          : " << m[i].prodi << endl;
+            cout << "Fakultas       : " << m[i].fakultas << endl;
+            cout << "IPK            : " << m[i].ipk << endl;
+            cout << endl;
+            i++;
+        }   
+    }
+    else // cari berdasarkan NIM
+    {
+        cout << "Nama Mahasiswa : " << m[found].namaMahasiswa << endl; 
+        cout << "NIM            : " << m[found].nim << endl;
+        cout << "Prodi          : " << m[found].prodi << endl;
+        cout << "Fakultas       : " << m[found].fakultas << endl;
+        cout << "IPK            : " << m[found].ipk << endl;
+    }
+}
+
+void simpanData(Mahasiswa m[], int n) {
+    ofstream file("dataMahasiswa.txt");
+
+    for(int i = 0; i < n; i++)
+    {
+        file << m[i].namaMahasiswa << "|";
+        file << m[i].nim << "|";
+        file << m[i].prodi << "|";
+        file << m[i].fakultas << "|";
+        file << m[i].ipk << endl;
+    }
+    file.close();
+}
+
+void ubahData() {
+    Mahasiswa m[100];
+    int n;
+
+    muatData(m, n);
+
+    if(n == 0)
+    {
+        cout << "Data kosong!" << endl;
         return;
     }
-    cout<<endl;
-    cout << "Data ditemukan!" << endl;
-    cout << "Nama Mahasiswa : " << m[found].namaMahasiswa << endl;
-    cout << "NIM            : " << m[found].nim << endl;
-    cout << "Prodi          : " << m[found].prodi << endl;
-    cout << "Fakultas       : " << m[found].fakultas << endl;
-    cout << "IPK            : " << m[found].ipk << endl;
+
+    cout << "\n=== DAFTAR DATA ===\n";
+
+    for(int i = 0; i < n; i++)
+    {
+        cout << i + 1 << ". "
+             << m[i].namaMahasiswa
+             << " | " << m[i].nim
+             << " | " << m[i].prodi
+             << " | "<< m[i].fakultas 
+             << " | " << m[i].ipk
+             << endl;
+    }
+
+    int pilihData;
+
+    cout << "\nPilih nomor data yang ingin diubah: ";
+    cin >> pilihData;
+    cin.ignore();
+
+    if(pilihData < 1 || pilihData > n)
+    {
+        cout << "Nomor data tidak valid!" << endl;
+        return;
+    }
+
+    int index = pilihData - 1;
+
+    cout << "\n=== INPUT DATA BARU ===\n";
+
+    cout<<"Nama Mahasiswa : ";
+    getline(cin, m[index].namaMahasiswa);
+
+    do
+    {
+        cout<<"NIM            : ";
+        getline(cin, m[index].nim);
+
+        if(!validNim(m[index].nim))
+        {
+            cout << "NIM harus 9 digit angka!" << endl;
+        }
+
+    } while(!validNim(m[index].nim));
+
+    cout<<"Prodi          : ";
+    getline(cin, m[index].prodi);
+
+    cout<<"Fakultas       : ";
+    getline(cin, m[index].fakultas);
+
+    do
+    {
+        cout<<"IPK            : ";
+        cin >> m[index].ipk;
+
+        if(m[index].ipk < 0 || m[index].ipk > 4)
+        {
+            cout << "IPK harus antara 0 - 4!" << endl;
+        }
+    } while(m[index].ipk < 0 || m[index].ipk > 4);
+    cin.ignore();
+
+    simpanData(m, n);
+
+    cout << "\nData berhasil diubah!" << endl;
 }
+
+void hapusData() {
+    Mahasiswa m[100];
+    int n;
+
+    muatData(m, n);
+
+    if(n == 0)
+    {
+        cout << "Data kosong!" << endl;
+        return;
+    }
+
+    cout << "\n=== DAFTAR DATA ===\n";
+
+    for(int i = 0; i < n; i++)
+    {
+        cout << i + 1 << ". "
+             << m[i].namaMahasiswa
+             << " | " << m[i].nim
+             << " | " << m[i].prodi
+             << " | "<< m[i].fakultas 
+             << " | " << m[i].ipk
+             << endl;
+    }
+
+    int pilihData;
+
+    cout << "\nPilih nomor data yang akan dihapus: ";
+    cin >> pilihData;
+
+    if(pilihData < 1 || pilihData > n)
+    {
+        cout << "Nomor data tidak valid!" << endl;
+        return;
+    }
+
+    char konfirmasi;
+
+    cout << "Yakin ingin menghapus data? (Y/T): ";
+    cin >> konfirmasi;
+
+    if(toupper(konfirmasi) != 'Y')
+    {
+        cout << "Penghapusan dibatalkan.\n";
+        return;
+    }
+
+    int index = pilihData - 1;
+
+    for(int i = index; i < n - 1; i++)
+    {
+        m[i] = m[i + 1];
+    }
+
+    n--;
+
+    simpanData(m, n);
+
+    cout << "\nData berhasil dihapus!" << endl;
+}
+
 
 int main() {
     int pilih;
-    do{
+    do {
 
         cout<<"============================================"<<endl;
         cout<<"               DATA MAHASISWA               "<<endl;
@@ -307,6 +551,7 @@ int main() {
         cout<<"4. Cari Data Mahasiswa"<<endl;
         cout<<"5. Ubah Data Mahasiswa"<<endl;
         cout<<"6. Hapus Data Mahasiswa"<<endl;
+        cout<<"7. Keluar Program"<<endl;
         cout<<"============================================"<<endl;
         cout<<"Pilih Menu (1-?): ";
         cin>>pilih;
@@ -330,11 +575,14 @@ int main() {
             break;
         case 6:
             hapusData();
+            break;  
+        case 7:
+            cout<<"Kamu sudah keluar dari program!!";
             break;
         default:
             cout<<"Pilihan Tidak Valid"<<endl;
             break;
         }
-    } while(pilih !=?);
+    } while(pilih !=7);
     return 0;
 }
