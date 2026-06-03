@@ -112,14 +112,17 @@ void tampilkanData() {
     file.close();
 }
 
-int partitionNim(Mahasiswa m[], int low, int high) {
+int partitionNim(Mahasiswa m[], int low, int high, bool ascending) {
     string pivot = m[high].nim;
 
     int i = low - 1;
 
     for (int j = low; j < high; j++)
     {
-        if (m[j].nim < pivot)
+        if (
+            (ascending && m[j].nim < pivot) ||
+            (!ascending && m[j].nim > pivot)
+           )
         {
             i++;
 
@@ -136,13 +139,13 @@ int partitionNim(Mahasiswa m[], int low, int high) {
     return i + 1;
 }
 
-void quickSort(Mahasiswa m[], int low, int high) {
+void quickSort(Mahasiswa m[], int low, int high, bool ascending) {
     if (low < high)
     {
-        int pi = partitionNim(m, low, high);
+        int pi = partitionNim(m, low, high, ascending);
 
-        quickSort(m, low, pi - 1);
-        quickSort(m, pi + 1, high);
+        quickSort(m, low, pi - 1, ascending);
+        quickSort(m, pi + 1, high, ascending);
     }
 }
 
@@ -158,10 +161,28 @@ void sortingNim() {
         return;
     }
 
-    quickSort(m, 0, n - 1);
+    int pilihan;
 
-    cout << "\n=== DATA SETELAH SORTING NIM ===\n";
+    cout<<endl;
+    cout << "Pilih Urutan:" << endl;
+    cout << "1. Ascending" << endl;
+    cout << "2. Descending" << endl;
+    cout << "Pilihan: ";
+    cin >> pilihan;
 
+    bool ascending = (pilihan == 1);
+
+    if (pilihan != 1 && pilihan != 2)
+    {
+        cout << "Pilihan tidak valid!" << endl;
+        return;
+    }
+
+    quickSort(m, 0, n - 1, ascending);
+
+    cout<<endl;
+    cout << "=== HASIL SORTING NIM ==="<<endl;
+    
     for(int i = 0; i < n; i++)
     {
         cout << "Data ke-" << i + 1 << endl;
